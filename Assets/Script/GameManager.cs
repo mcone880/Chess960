@@ -9,13 +9,15 @@ public class GameManager : MonoBehaviour {
 	public GameObject CubeLight;
 	public GameObject[] PiecesGO = new GameObject[6];
 	public int activePlayer = 1;  // 1 = White, -1 = Dark
-	public bool player1AI    = false;  // Bool that state if player1 is a AI
-	public bool player2AI    = false;  // Bool that state if player2 is a AI
+	public bool player1AI = false;  // Bool that state if player1 is a AI
+	public bool player2AI = false;  // Bool that state if player2 is a AI
 	public Material DarkMat;
 	public Material LightMat;
-	public int gameState = 0;			// In this state, the code is waiting for : 0 = Piece selection, 1 = Piece animation
-	
-	
+	public int gameState = 0;           // In this state, the code is waiting for : 0 = Piece selection, 1 = Piece animation
+
+	Dictionary<string, (GameObject, int)> whitePieces = new Dictionary<string, (GameObject, int)>();
+	Dictionary<string, (GameObject, int)> blackPieces = new Dictionary<string, (GameObject, int)>();
+
 	private GameObject SelectedPiece;	// Selected Piece
 	private int _boardHeight = -1;
 	private int _pieceHeight =  0;
@@ -78,24 +80,24 @@ public class GameManager : MonoBehaviour {
 		if(PlayerPrefs.GetString("GameMode") == "Regular Chess")
         {
 			// Create white pieces
-			CreatePiece("Rook", 0, whiteLinePos, whitePlayer);
+			CreatePiece("Rook1", 0, whiteLinePos, whitePlayer);
 			CreatePiece("Knight", 1, whiteLinePos, whitePlayer);
-			CreatePiece("Bishop", 2, whiteLinePos, whitePlayer);
+			CreatePiece("Bishop1", 2, whiteLinePos, whitePlayer);
 			CreatePiece("Queen", 3, whiteLinePos, whitePlayer);
 			CreatePiece("King", 4, whiteLinePos, whitePlayer);
-			CreatePiece("Bishop", 5, whiteLinePos, whitePlayer);
+			CreatePiece("Bishop2", 5, whiteLinePos, whitePlayer);
 			CreatePiece("Knight", 6, whiteLinePos, whitePlayer);
-			CreatePiece("Rook", 7, whiteLinePos, whitePlayer);
+			CreatePiece("Rook2", 7, whiteLinePos, whitePlayer);
 
 			// Create Dark pieces
-			CreatePiece("Rook", 0, blackLinePos, blackPlayer);
+			CreatePiece("Rook1", 0, blackLinePos, blackPlayer);
 			CreatePiece("Knight", 1, blackLinePos, blackPlayer);
-			CreatePiece("Bishop", 2, blackLinePos, blackPlayer);
+			CreatePiece("Bishop1", 2, blackLinePos, blackPlayer);
 			CreatePiece("Queen", 3, blackLinePos, blackPlayer);
 			CreatePiece("King", 4, blackLinePos, blackPlayer);
-			CreatePiece("Bishop", 5, blackLinePos, blackPlayer);
+			CreatePiece("Bishop2", 5, blackLinePos, blackPlayer);
 			CreatePiece("Knight", 6, blackLinePos, blackPlayer);
-			CreatePiece("Rook", 7, blackLinePos, blackPlayer);
+			CreatePiece("Rook2", 7, blackLinePos, blackPlayer);
 		} else
         {
 			//Create White Pieces
@@ -112,24 +114,24 @@ public class GameManager : MonoBehaviour {
 			{
 				randPlace = Random.Range(0, kingPos);
 			} while (takenSpots.Contains(randPlace));
-			CreatePiece("Rook", randPlace, whiteLinePos, whitePlayer);
-			CreatePiece("Rook", randPlace, blackLinePos, blackPlayer);
+			CreatePiece("Rook1", randPlace, whiteLinePos, whitePlayer);
+			CreatePiece("Rook1", randPlace, blackLinePos, blackPlayer);
 			takenSpots.Add(randPlace);
 
 			do
 			{
 				randPlace = Random.Range(kingPos, 8);
 			} while (takenSpots.Contains(randPlace));
-			CreatePiece("Rook", randPlace, whiteLinePos, whitePlayer);
-			CreatePiece("Rook", randPlace, blackLinePos, blackPlayer);
+			CreatePiece("Rook2", randPlace, whiteLinePos, whitePlayer);
+			CreatePiece("Rook2", randPlace, blackLinePos, blackPlayer);
 			takenSpots.Add(randPlace);
 
 			do
 			{
 				randPlace = Random.Range(0, 7);
 			} while (takenSpots.Contains(randPlace));
-			CreatePiece("Bishop", randPlace, whiteLinePos, whitePlayer);
-			CreatePiece("Bishop", randPlace, blackLinePos, blackPlayer);
+			CreatePiece("Bishop1", randPlace, whiteLinePos, whitePlayer);
+			CreatePiece("Bishop1", randPlace, blackLinePos, blackPlayer);
 			takenSpots.Add(randPlace);
 			if (randPlace % 2 == 0) bishop1Even = true;
 			if (bishop1Even)
@@ -146,24 +148,24 @@ public class GameManager : MonoBehaviour {
 					randPlace = Random.Range(0, 8);
 				} while (randPlace % 2 != 0 || takenSpots.Contains(randPlace));
 			}
-			CreatePiece("Bishop", randPlace, whiteLinePos, whitePlayer);
-			CreatePiece("Bishop", randPlace, blackLinePos, blackPlayer);
+			CreatePiece("Bishop2", randPlace, whiteLinePos, whitePlayer);
+			CreatePiece("Bishop2", randPlace, blackLinePos, blackPlayer);
 			takenSpots.Add(randPlace);
 
 			do
 			{
 				randPlace = Random.Range(0, 8);
 			} while (takenSpots.Contains(randPlace));
-			CreatePiece("Knight", randPlace, whiteLinePos, whitePlayer);
-			CreatePiece("Knight", randPlace, blackLinePos, blackPlayer);
+			CreatePiece("Knight1", randPlace, whiteLinePos, whitePlayer);
+			CreatePiece("Knight1", randPlace, blackLinePos, blackPlayer);
 			takenSpots.Add(randPlace);
 
 			do
 			{
 				randPlace = Random.Range(0, 8);
 			} while (takenSpots.Contains(randPlace));
-			CreatePiece("Knight", randPlace, whiteLinePos, whitePlayer);
-			CreatePiece("Knight", randPlace, blackLinePos, blackPlayer);
+			CreatePiece("Knight2", randPlace, whiteLinePos, whitePlayer);
+			CreatePiece("Knight2", randPlace, blackLinePos, blackPlayer);
 			takenSpots.Add(randPlace);
 
             do
@@ -172,8 +174,55 @@ public class GameManager : MonoBehaviour {
             } while (takenSpots.Contains(randPlace));
             CreatePiece("Queen", randPlace, whiteLinePos, whitePlayer);
             CreatePiece("Queen", randPlace, blackLinePos, blackPlayer);
+
+			RunUnitTests(bishop1Even);
         }
 	}
+
+	public void RunUnitTests(bool bishop1)
+    {
+		//Should Succeed
+		RunKingCheck(whitePieces);
+		RunKingCheck(blackPieces);
+		RunBishopCheck(whitePieces, bishop1);
+		RunBishopCheck(blackPieces, bishop1);
+
+		//Should Fail
+		RunKingPosition(whitePieces);
+		RunKingPosition(blackPieces);
+    }
+
+	public void RunKingCheck(Dictionary<string, (GameObject, int)> pieces)
+    {
+		var king = pieces["King"];
+		var rook1 = pieces["Rook1"];
+		var rook2 = pieces["Rook2"];
+
+		print("King Test: " + (king.Item2 > rook1.Item2 && king.Item2 < rook2.Item2));
+    }
+
+	public void RunKingPosition(Dictionary<string, (GameObject, int)> pieces)
+    {
+		var king = pieces["King"];
+		print("King Pos Test: " + (king.Item2 == 7 || king.Item2 == 0));
+    }
+
+	public void RunBishopCheck(Dictionary<string, (GameObject, int)> pieces, bool bish1Even)
+    {
+		var bis1 = pieces["Bishop1"];
+		var bis2 = pieces["Bishop2"];
+
+		if(bish1Even)
+        {
+			print("Bishop Test: " + (bis1.Item2 % 2 == 0 && bis2.Item2 % 2 != 0));
+        } else
+        {
+			print("Bishop Test: " + (bis2.Item2 % 2 == 0 && bis1.Item2 % 2 != 0));
+		}
+    }
+
+
+
 	
 	// Spawn a piece on the board
 	void CreatePiece(string _pieceName, int _posX, int _posY, int _playerTag)
@@ -186,15 +235,24 @@ public class GameManager : MonoBehaviour {
 		    case "Pawn": 
 				_pieceIndex = 1;
 		        break;
-			case "Rook": 
+			case "Rook1": 
 				_pieceIndex = 2;
 		        break;
-			case "Knight": 
+			case "Rook2":
+				_pieceIndex = 2;
+				break;
+			case "Knight1": 
 				_pieceIndex = 3;
 		        break;
-			case "Bishop": 
+			case "Knight2":
+				_pieceIndex = 3;
+				break;
+			case "Bishop1": 
 				_pieceIndex = 4;
 		        break;
+			case "Bishop2":
+				_pieceIndex = 4;
+				break;
 			case "Queen": 
 				_pieceIndex = 5;
 		        break;
@@ -212,13 +270,15 @@ public class GameManager : MonoBehaviour {
 		{
 			_PieceToCreate.tag = "1";
 			_PieceToCreate.GetComponent<Renderer>().material = LightMat;
+			if(_PieceToCreate.name != "Pawn") whitePieces.Add(_PieceToCreate.name, (_PieceToCreate, _posX));
 		}
 		else if(_playerTag == -1)
 		{
 			_PieceToCreate.tag = "-1";
-			_PieceToCreate.GetComponent<Renderer>().material = DarkMat;		
+			_PieceToCreate.GetComponent<Renderer>().material = DarkMat;
+			if (_PieceToCreate.name != "Pawn") blackPieces.Add(_PieceToCreate.name, (_PieceToCreate, _posX));
 		}
-		
+
 		_boardPieces[_posX,_posY] = _pieceIndex*_playerTag; 
 	}
 	
@@ -313,28 +373,48 @@ public class GameManager : MonoBehaviour {
 				}
 				
 		        break;
-		    case "Rook":
+		    case "Rook1":
 				// Rook can move horizontally or vertically
 				if((_deltaX != 0 && _deltaY == 0) || (_deltaX == 0 && _deltaY != 0)) 
 				{
 					_movementLegalBool = true;
 				}
 		        break;
-			case "Knight":
+			case "Rook2":
+				// Rook can move horizontally or vertically
+				if ((_deltaX != 0 && _deltaY == 0) || (_deltaX == 0 && _deltaY != 0))
+				{
+					_movementLegalBool = true;
+				}
+				break;
+			case "Knight1":
 				// Knight move in a L movement. distance is evaluated by a multiplication of both direction
 				if((_deltaX != 0 && _deltaY != 0) && Mathf.Abs(_deltaX*_deltaY) == 2)
 				{
 					_movementLegalBool = true;
 				}
-		        break;
-			case "Bishop":
+				break;
+			case "Knight2":
+				// Knight move in a L movement. distance is evaluated by a multiplication of both direction
+				if ((_deltaX != 0 && _deltaY != 0) && Mathf.Abs(_deltaX * _deltaY) == 2)
+				{
+					_movementLegalBool = true;
+				}
+				break;
+			case "Bishop1":
 				// Bishop can only move diagonally
 				if(Mathf.Abs(_deltaX/_deltaY) == 1)
 				{
 					_movementLegalBool = true;
 				}
 		        break;
-			
+			case "Bishop2":
+				// Bishop can only move diagonally
+				if (Mathf.Abs(_deltaX / _deltaY) == 1)
+				{
+					_movementLegalBool = true;
+				}
+				break;
 			case "Queen":
 				// Queen movement is a combination of Rook and bishop
 				if(((_deltaX != 0 && _deltaY == 0) || (_deltaX == 0 && _deltaY != 0)) || Mathf.Abs(_deltaX/_deltaY) == 1)

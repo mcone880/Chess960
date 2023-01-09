@@ -26,7 +26,6 @@ public class PlayerControl : MonoBehaviour {
 		_activePlayer = _GameManager.activePlayer;
 		if((_activePlayer == 1 && _player1AI == false) || (_activePlayer == -1 && _player2AI == false))
 		{
-			Debug.Log ("Select");
 			GetMouseInputs();
 		}
 	}
