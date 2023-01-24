@@ -81,22 +81,22 @@ public class GameManager : MonoBehaviour {
         {
 			// Create white pieces
 			CreatePiece("Rook1", 0, whiteLinePos, whitePlayer);
-			CreatePiece("Knight", 1, whiteLinePos, whitePlayer);
+			CreatePiece("Knight1", 1, whiteLinePos, whitePlayer);
 			CreatePiece("Bishop1", 2, whiteLinePos, whitePlayer);
 			CreatePiece("Queen", 3, whiteLinePos, whitePlayer);
 			CreatePiece("King", 4, whiteLinePos, whitePlayer);
 			CreatePiece("Bishop2", 5, whiteLinePos, whitePlayer);
-			CreatePiece("Knight", 6, whiteLinePos, whitePlayer);
+			CreatePiece("Knight2", 6, whiteLinePos, whitePlayer);
 			CreatePiece("Rook2", 7, whiteLinePos, whitePlayer);
 
 			// Create Dark pieces
 			CreatePiece("Rook1", 0, blackLinePos, blackPlayer);
-			CreatePiece("Knight", 1, blackLinePos, blackPlayer);
+			CreatePiece("Knight1", 1, blackLinePos, blackPlayer);
 			CreatePiece("Bishop1", 2, blackLinePos, blackPlayer);
 			CreatePiece("Queen", 3, blackLinePos, blackPlayer);
 			CreatePiece("King", 4, blackLinePos, blackPlayer);
 			CreatePiece("Bishop2", 5, blackLinePos, blackPlayer);
-			CreatePiece("Knight", 6, blackLinePos, blackPlayer);
+			CreatePiece("Knight2", 6, blackLinePos, blackPlayer);
 			CreatePiece("Rook2", 7, blackLinePos, blackPlayer);
 		} else
         {
